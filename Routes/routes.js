@@ -1,0 +1,18 @@
+const router = require('express').Router()
+const {getGames, pushGames, findGames, listGames, getMoviescate, postComment, deleteMovies, pushSeason, createGroup , pushgroupcomment, getGroup, userData, loginIn, getGroupSlice  } = require('../Controller/controller')
+
+router.get('/get', getGames)
+router.get('/getcate', getMoviescate)
+router.post('/postgame', pushGames)
+router.get('/getGame/:id', findGames)
+router.get('/listGames/:category', listGames)
+router.put('/postComment/:id', postComment)
+router.delete("/deleteMovies", deleteMovies)
+router.put("/pushSeason/:id", pushSeason )
+router.post("/group", createGroup)
+router.put("/pushgroupcomment/:id", pushgroupcomment )
+router.get('/getGroup', getGroup)
+router.post('/userData', userData)
+router.post('/loginIn', loginIn)
+router.get('/getGroupSlice/:id', getGroupSlice)
+module.exports = router

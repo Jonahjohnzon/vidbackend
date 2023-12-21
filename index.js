@@ -4,9 +4,10 @@ const cors = require('cors')
 const mongoose = require('./mongo')
 const router = require('./Routes/routes')
 require('dotenv').config()
+app.use(cors())
 mongoose()
 const port = process.env.PORT || 5000
-app.use(cors())
+
 app.use(require('express').json())
 app.use('/', router)
 

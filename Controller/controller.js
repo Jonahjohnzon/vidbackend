@@ -1,37 +1,104 @@
-const { groups, user, movies, upcoming } = require("../Schema/schema");
+const {  user, movies, upcoming } = require("../Schema/schema");
 const JWT = require('jsonwebtoken') 
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
+const { search } = require("../Routes/routes");
 
-const getGames = async(req,res)=>{
+
+const getMovies = async(req,res)=>{
     try{
-    const data = await movies.find({})
     
-        res.json(data)
+    const data = await movies.find({})
+   
+    return  res.json(data)
     }
     catch(err){
-        res.json(err)
+        console.log(err)
+    }
+}
+
+const Searchmovie = async(req, res)=>{
+    const letter = req.params.searchmov
+    if(letter == "")
+    {
+    
+        return res.json({data:[],auth:true})
+    }
+    try{
+        const result = await movies.find({ title:{'$regex':`.*${letter.split('').join('.*')}.*`, $options: 'i'}})
+        const modifiedResult = result.map(movie => ({ title: movie.title, _id: movie._id , series:movie.series}));
+        res.json({data:modifiedResult, auth:true})
+    }
+    catch(e){
+        console.log(e)
+
+    }
+}
+const Search = async(req, res)=>{
+    const letter = req.params.search
+    const cate = req.query.cate.toUpperCase()
+    const type = req.query.type.toUpperCase()
+    const limit = req.query.limit
+    const start = req.query.start
+  
+    if(letter == "")
+    {
+    
+        return res.json({data:[],auth:true})
+    }
+    try{
+         if(cate != "ASIANSERIES" && cate != "ANIME" && cate != "TVSHOWS" && cate != "MOVIES"){
+           
+        const result = await movies.find({ title:{'$regex':`.*${letter.split('').join('.*')}.*`, $options: 'i'},  category:cate.toLowerCase(), $or: [
+            {"type.a": type},
+            {"type.b": type},
+            {"type.c": type}
+          ]})
+          const info = result.slice(start, limit)
+        res.json({info:info, auth:true, length:info.length})
+         }
+         else if(cate == "MOVIES")
+         {
+            const result = await movies.find({ title:{'$regex':`.*${letter.split('').join('.*')}.*`, $options: 'i'}, series:false, category:type.toLowerCase()})
+            const info = result.slice(start, limit)
+            res.json({info:info, auth:true, length:info.length})
+         }
+         else{
+            
+            const result = await movies.find({ title:{'$regex':`.*${letter.split('').join('.*')}.*`, $options: 'i'},  category:cate.toLowerCase()})
+            const info = result.slice(start, limit)
+            res.json({info:info, auth:true, length:info.length})
+         }
+    }
+    catch(e){
+        console.log(e)
+
     }
 }
 const getMoviescate = async(req,res)=>{
     try{
     const datah = await movies.find({category:"hollywood",series:false})
-    const hollywood = datah.slice(0, 6)
+    const hollywood = datah.reverse().slice(0, 6)
     const datab= await movies.find({category:"bollywood",series:false})
-    const bollywood = datab.slice(0, 6)
-    const datan = await movies.find({category:"nollywood",series:false})
-    const nollywood = datan.slice(0, 6)
-    const kseries = await movies.find({category:"kseries",series:true})
-    const datak = kseries.slice(0, 5)
-    const anime = await movies.find({category:"anime",series:true})
-    const dataa = anime.slice(0, 3)
-    const datatop = await movies.find({top:true})
-    const top = datatop.slice(0,3)
-     
-
-        res.json({hollywood,bollywood,nollywood,top,datak, dataa})
+    const bollywood = datab.reverse().slice(0, 6)
+    const datatop = await movies.find({top:true}).sort({"updatedAt": -1}).limit(3)
+    const top = datatop.reverse().slice(0,3)
+    const trailer = await upcoming.find({})
+    const asian = await movies.find({category:"asianseries"}).sort({"updatedAt": -1}).limit(5)
+    const animes = await movies.find({category:"anime"}).sort({"updatedAt": -1}).limit(6)
+    const tv = await movies.find({category:"tvshows"}).sort({"updatedAt": -1}).limit(6)
+    const latest= await movies.find({category:"anime"})
+    const late = latest[latest.length - 1]
+    const newest = animes
+    let dataa = animes
+    
+    let tvshows = tv
+    
+    let datak = asian
+    
+    return res.json({hollywood,bollywood,tvshows,top,datak, dataa,trailer, newest,late})
     }
     catch(err){
-        res.json(err)
+        console.log(err)
     }
 }
 
@@ -60,29 +127,117 @@ const userData = async(req, res)=>{
             profile_image:"1",
             notification:{
                 notify:{
-                    message:"🌟 Welcome to the community! Dive into discussions, share your passion, and make yourself at home. Enjoy your stay! 🚀",
-                    active:true
+                    message:"🌟 Welcome to the Movie community! Dive into discussions, share your passion, and make yourself at home. Enjoy your stay! 🚀",
                 },
                 alarm:true},
             suspend:false,
             ban:false,
-            followers:[],
-            followings:[],
             videos:[]
         })
          await data.save()
-         console.log("yes")
-         res.json({create:true, message:"Account Create"})
+         return res.json({create:true, message:"Account Create"})
     }
         catch(e)
         {
+            
             console.log(e)
-            res.json({create:false})
         }
     
 }
+const check = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const info = await user.findOne({ _id: id });
+
+        if (info == null) {
+            return res.json({ auth: false, message: "Email Not Found" });
+        }
+
+        if (info.admin) {
+            res.json({ auth: true });
+        } else {
+            res.json({ auth: false });
+        }
+    } catch (error) {
+        console.error("Error in check function:", error);
+        res.status(500).json({ auth: false, message: "Internal Server Error" });
+    }
+};
+
+const pushUsers = async(req,res)=>{
+    try{const id = req.params.id
+    await user.findByIdAndUpdate({_id:id},{
+        profile_image:req.body.profile_image,
+        user_name:req.body.user_name
+    })
+    return res.json({update:true})
+}
+catch(e){
+    console.log(e)
+}}
+
+const notify = async(req,res)=>{
+   try{
+    const id = req.params.id
+    const data = await user.findOne({_id:id})
+    const notice = data.notification
+    if(notice.alarm)
+    {
+    await user.findByIdAndUpdate({_id:id},{
+        $set:{
+            "notification.alarm":false
+            
+        }
+        
+    })}
+    return res.json(notice)
+   }
+   catch(e)
+   {
+    console.log(e)
+   }
+}
+
+const changePass = async (req,res) =>{
+    try{
+    const cpass = req.body.cpassword
+    const npass = req.body.npassword
+    const copass = req.body.copassword
+    const id = req.params.id
+    const info = await user.findOne({_id:id})
+    if(copass !== npass)
+    {
+        return res.json({mgs:"New Password and Comfirm Password dont match", update:false})
+    }
+    if(cpass == npass)
+    {
+        return res.json({mgs:"New Password and Current Password can't be the same", update:false})
+    }
+     
+    const result = await bcrypt.compare(cpass, info.password)
+        if(result)
+        {
+        const pass = req.body.npassword
+        const salt = await bcrypt.genSalt()
+        const hash = await bcrypt.hash(pass, salt)
+        await user.findByIdAndUpdate({_id:id},{
+            password:hash,
+        })
+        
+        return res.json({update:true})
+    }
+        else{
+            res.json({mgs:"Current Password Wrong", update:false})
+        }
+    }
+    catch(e){
+        console.log(e)
+    }
+}
+    
 
 const loginIn = async(req, res) =>{
+    try{
     const emailinfo = req.body.email.toUpperCase()
     const info = await user.findOne({email:emailinfo})
     if(info == null){
@@ -94,28 +249,53 @@ const loginIn = async(req, res) =>{
         const id = info._id
         const token = JWT.sign({id}, process.env.JWTS)
         const userdata = {user_name:info.user_name, _id:info._id, admin:info.admin, group_access:info.group_access, profile_image:info.profile_image, rank:info.rank, notification:info.notification, suspend:info.suspend, ban:info.ban}
-        res.json({auth:true, token:token, data:userdata})
+        return res.json({auth:true, token:token, data:userdata})
     }
     else{
         return res.json({auth:false, message:'Password Wrong'})
     }
-
+    }
+    catch(e)
+    {
+        console.log(e)
+    }
     
+}
+
+const getUser = async(req, res)=>{
+    const id = req.params.id
+    try{
+    const info = await user.findOne({_id: id})
+    const result ={
+        user_name:info.user_name,
+        email:info.email,
+        profile_image:info.profile_image,
+        rank:info.rank,
+        videos:info.videos,
+        notification:info.notification.alarm,
+        _id:info._id
+    }
+    return res.json(result)
+    }
+    catch(e){
+        console.log(e)
+    }
 }
 
 const deleteMovies = async (req, res) => {
    
     try{ 
     await movies.deleteMany({})
-        res.json("done")
+        return res.json("done")
     }
     catch(e){
-        res.json(e)
+        console.log(e)
     }
 }
 
-const pushGames = async (req, res) => {
+const pushMovie = async (req, res) => {
     try{
+        if(!req.body.series){
     const post = await movies.create({
         title:req.body.title,
         rating:req.body.rating,
@@ -127,130 +307,279 @@ const pushGames = async (req, res) => {
         image:req.body.image,
         overview:req.body.overview,
         comment:[],
-        download:req.body.download,
+        lowdownload:{size:req.body.lowdownload.size,link:req.body.lowdownload.link},
+        highdownload:{size:req.body.highdownload.size,link:req.body.highdownload.link},
         trailer:req.body.trailer,
         category:req.body.category,
-        top:req.body.top,
+        top:false,
+        series:req.body.series,
+    })
+    await post.save()
+    return res.json('successful')
+}
+else{
+    const post = await movies.create({
+        title:req.body.title,
+        rating:req.body.rating,
+        year:req.body.year,
+        type:req.body.type,
+        runtime:req.body.runtime,
+        rated:req.body.rated,
+        release:req.body.release,
+        image:req.body.image,
+        overview:req.body.overview,
+        comment:[],
+        trailer:req.body.trailer,
+        category:req.body.category,
+        top:false,
         series:req.body.series,
         seasons:req.body.seasons
     })
     await post.save()
-   
-        res.json('successful')
-    }
-    catch(e)
-    {
-        res.json(e)
-    }
+    return res.json('successful')
 }
-const createGroup = async (req, res) =>{
-    try{
-    const group  = await groups.create({
-        title:req.body.title,
-        subtitle:req.body.subtitle,
-        owner:req.body.owner,
-        comments:[],
-        profile:req.body.profile})
-    await group.save()
-    
-        res.json('successful')
-    }
-    catch(e)
-    {
-        res.json(e)
-    }
-}
-
-const pushgroupcomment = async (req, res) =>{
-   
-    try{ 
-    const id = req.params.id
-    let link = ""
-    let titles = ""
-    let wordings =""
-    if(req.body.comment.title){
-        link = req.body.comment.link
-        titles = req.body.comment.titles
-        wordings = req.body.comment.wordings
-    }
-      const data = await groups.findByIdAndUpdate({_id:id},{
-        $push:{
-            "comment":{
-                "name":req.body.comment.name,
-                "user_id":req.body.comment.user_id,
-                "chat":req.body.comment.chat,
-                "profile_image":req.body.comment.profile_image,
-                "reaction":req.body.comment.reaction,
-                "title":req.body.comment.title,
-                "link":link,
-                "titles":titles,
-                "wordings":wordings,
-                "rank":req.body.comment.rank,
-                "star": req.body.comment.star
-            }
-        }
-    },{ new: true })
-   
-        res.json(data)
     }
     catch(e)
     {
         console.log(e)
     }
-
 }
+const editMovie = async (req, res) => {
+    try {
+      
+      const existingMovie = await movies.findByIdAndUpdate(req.params.id,{
+            $set:{
+                title : req.body.title,
+                rating : req.body.rating,
+                year : req.body.year,
+                type : req.body.type,
+                runtime : req.body.runtime,
+                rated : req.body.rated,
+                release : req.body.release,
+                image : req.body.image,
+                overview : req.body.overview,
+                lowdownload : {
+                  size: req.body.lowdownload.size,
+                  link: req.body.lowdownload.link,
+                },
+                highdownload : {
+                  size: req.body.highdownload.size,
+                  link: req.body.highdownload.link,
+                },
+                trailer : req.body.trailer,
+                category : req.body.category,
+                top : req.body.top,
+                series : req.body.series,
+               
+            }
+      },
+      { new: true } );
+  
+      if (!existingMovie) {
+        return res.status(404).json({ error: 'Movie not found', auth:false });
+      }
+      return res.json({mgs:true});
+    } catch (e) {
+      return res.status(500).json({ error: 'Internal Server Error', auth:false });
+    }
+  };
+  
+  
+  const pushSeries = async (req, res) => {
+ 
+    try {
+        if (req.body.series) {
+            const filter = { _id: req.params.id }; // Assuming _id is passed in the request body
 
-const getGroup = async(req,res)=>{
-    try{
-    const data = await groups.find({})
-        res.json(data)
+            const update = {
+                $set:
+                {title: req.body.title,
+                rating: req.body.rating,
+                year: req.body.year,
+                type: req.body.type,
+                runtime: req.body.runtime,
+                rated: req.body.rated,
+                release: req.body.release,
+                image: req.body.image,
+                overview: req.body.overview,
+                comment: [],
+
+                trailer: req.body.trailer,
+                category: req.body.category,
+                top: false,
+                seasons : req.body.seasons,
+                series: req.body.series}
+            };
+            const options = { upsert: true, new: true, setDefaultsOnInsert: true };
+
+            const updatedPost = await movies.findOneAndUpdate(filter, update, options);
+            if (!updatedPost) {
+                return res.status(404).json({ error: 'Movie not found', auth:false });
+              }
+
+            res.json({mgs:true});
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' , auth:false});
     }
-    catch(err){
-        res.json(err)
-    }
-}
-const getGroupSlice = async(req,res)=>{
+};
+
+
+const findMovie = async (req, res) =>{
     try{
-    const start = req.query.start
     const limit = req.query.limit
-    const id = req.params.id
-    const data = await groups.findOne({_id:id})
-    const datas = await groups.find({})
-    const newdata = datas.reverse().slice(0, 5)
-    const info = data.comment.slice(start, limit)
-    const total = {
-        comments:info,
-        title: data.title,
-        subtitle:data.subtitle,
-        owner: data.owner,
-        _id:data._id,
-        profile:data.profile,
-        newdata:newdata
-    }
-    res.json(total)
-    }
-    catch(err){
-        res.json(err)
-    }
-}
-const findGames = async (req, res) =>{
-    try{
+    const start = req.query.start
     const id = req.params.id
     const data = await movies.findOne({_id:id})
-        res.json(data)
+    if(!data)
+    {
+        return res.json({auth:false})
+    }
+    const comm = data.comment.slice(start,limit)
+    const infolength = data.comment.length
+
+    if(data.series)
+    {
+    const info = {
+        top:data.top,
+        trailer:data.trailer,
+        category:data.category,
+        series:data.series,
+        seasons:data.seasons,
+        data:data.data,
+        _id:data._id,
+        title:data.title,
+        rating:data.rating,
+        year: data.year,
+        type:data.type,
+        runtime:data.runtime,
+        rated:data.rated,
+        release:data.release,
+        image:data.image,
+        overview:data.overview,
+        comment:comm,
+        length:infolength,
+    }
+        return res.json(info)
+}
+else{
+    const info = {
+        top:data.top,
+        lowdownload:data.lowdownload,
+        highdownload:data.highdownload,
+        trailer:data.trailer,
+        category:data.category,
+        data:data.data,
+        _id:data._id,
+        title:data.title,
+        rating:data.rating,
+        year: data.year,
+        type:data.type,
+        runtime:data.runtime,
+        rated:data.rated,
+        release:data.release,
+        image:data.image,
+        overview:data.overview,
+        comment:comm,
+        length:infolength
+    }
+        return res.json(info)
+}
     }
     catch(e)
     {
-        res.json(e)
+       return res.json({auth:false})
     }
 
 }
 
-const listGames = async (req, res) =>{
+
+const findMovies = async (req, res) =>{
+    try{
+    const limit = req.query.limit
+    const start = req.query.start
+    const season = req.query.season
+    const id = req.params.id
+    const data = await movies.findOne({_id:id})
+    const number = data.seasons.length
+    const limi = data.seasons[season - 1]
+    const comm = data.comment.slice(start,limit)
+    const infolength = data.comment.length
+
+    if(data.series)
+    {
+    const info = {
+        top:data.top,
+        trailer:data.trailer,
+        category:data.category,
+        series:data.series,
+        seasons:limi,
+        data:data.data,
+        _id:data._id,
+        title:data.title,
+        rating:data.rating,
+        year: data.year,
+        type:data.type,
+        runtime:data.runtime,
+        rated:data.rated,
+        release:data.release,
+        image:data.image,
+        overview:data.overview,
+        comment:comm,
+        length:infolength,
+        number
+    }
+        return res.json(info)
+}
+else{
+    const info = {
+        top:data.top,
+        lowdownload:data.lowdownload,
+        highdownload:data.highdownload,
+        trailer:data.trailer,
+        category:data.category,
+        data:data.data,
+        _id:data._id,
+        title:data.title,
+        rating:data.rating,
+        year: data.year,
+        type:data.type,
+        runtime:data.runtime,
+        rated:data.rated,
+        release:data.release,
+        image:data.image,
+        overview:data.overview,
+        comment:comm,
+        length:infolength
+    }
+        return res.json(info)
+}
+    }
+    catch(e)
+    {
+        return res.json(false)
+    }
+
+}
+
+const deletemovie =async(req, res)=>{
+    try{
+    const id = req.params.id
+    await movies.deleteOne({_id:id})
+    
+        res.json({delete:true})
+}
+    catch(e){
+        console.log(e)
+    }
+
+}
+
+const listMovies = async (req, res) =>{
     const id = req.params.category.toUpperCase()
     const limit = req.query.limit
     const start = req.query.start
-    if (id != "MOVIES" && id != "KSERIES" && id != "ANIME")
+    if (id != "MOVIES" && id != "ASIANSERIES" && id != "ANIME" && id != "TVSHOWS")
     {
         try{
         const data = await movies.find({
@@ -258,87 +587,157 @@ const listGames = async (req, res) =>{
           {"type.a": id},
           {"type.b": id},
           {"type.c": id}
-        ]
+        ],series:false
       })
     
         const length = data.length
-        const info = data.slice(start, limit)
-        res.json({info:info,length:length})
+        if(length < 1)
+        {
+            return res.json(false)
+        }
+        const info = data.reverse().slice(start, limit)
+        return res.json({info:info,length:length})
     }catch(e){
-        res.json(e)
+        return res.json({auth:false})
     }}
     else if(id == "MOVIES"){
         try{
-        const data = await movies.find({
+        const data = await movies.find({series:false
           })
          
             const length = data.length
-            const info = data.slice(start, limit)
-            res.json({info:info,length:length})
+            const info = data.reverse().slice(start, limit)
+            return  res.json({info:info,length:length})
         }catch(e){
-            res.json(e)
+            console.log(e)
         }
     }
-    else if(id == "KSERIES")
+    else if(id == "ASIANSERIES")
     {
         try{
-        const data = await movies.find({category:"kseries",series:true})
+        const data = await movies.find({category:"asianseries",series:true})
        
           const length = data.length
-          const info = data.slice(start, limit)
-          res.json({info:info,length:length})
+          const info = data.reverse().slice(start, limit)
+          return res.json({info:info,length:length})
       }catch(e){
-          res.json(e)
+        console.log(e)
       }
     }
-    else{
+    else if(id == "TVSHOWS")
+    {
+        try{
+        const data = await movies.find({category:"tvshows",series:true})
+       
+          const length = data.length
+          const info = data.reverse().slice(start, limit)
+          return res.json({info:info,length:length})
+      }catch(e){
+        console.log(e)
+      }
+    }
+    else if(id == "ANIME"){
         try{
         const data = await movies.find({category:"anime",series:true})
           const length = data.length
-          const info = data.slice(start, limit)
-          res.json({info:info,length:length})
+          const info = data.reverse().slice(start, limit)
+         
+          return res.json({info:info,length:length})
       }catch(e){
-          res.json(e)
+        console.log(e)
       }
     }
+    else{
+        return res.json({auth:false})
+    }
 }
-
-const pushSeason = async(req,res) =>{
+const Upcome = async(req, res)=>{
     try{
-    const id = req.params.id
-    const data = await movies.updateOne({_id:id},{
-        $push:{
-            "seasons":[
-                {
-                 "number":req.body.number,
-                "episode":req.body.episode
-            }]
-        }
-    })
+        const data = await upcoming.find({})
         res.json(data)
     }
-    catch(e)
-    {
+    catch(e){
+        console.log(e)
+    }
+}
+const upcomingPush = async(req, res)=>{
+    try{
+        const data = await upcoming.find({})
+        if(data.length > 0)
+        {
+           
+        const id = data[0]._id
+        if(data.length > 6)
+        {
+            await upcoming.deleteOne({_id:id})
+        }}
+        const pushs = await upcoming.create({
+            title:req.body.title,
+            image:req.body.image,
+            src:req.body.src
+        })
+        await pushs.save()
+        res.json({mgs:true})
+    }
+    catch(e){
         console.log(e)
     }
 }
 
+
+
 const postComment = async(req, res) =>{
+   
     try{
     const comments = req.body.comment
     const id = req.params.id
-    const result = await movies.updateOne({_id:id},{
+    const users = await user.findOne({_id:req.body.comment.id_user})
+    if(!users)
+    {
+        return res.json({ auth:false})
+    }
+    if(comments.re)
+    {
+    const data = await movies.findByIdAndUpdate({_id:id},{
         $push:{
             "comment":{
                 chat:comments.chat,
-                name:comments.name,
-                id_user:comments.id_user,
-                profile_image:comments.profile_image,
-                reaction:comments.reaction
+                name:users.user_name,
+                id_user:users._id,
+                profile_image:users.profile_image,
+                reaction:0,
+                rank:users.rank,
+                re:true
             }
         }
     })
-        res.json(result)
+    const inf = data.comment.length
+    return res.json({no:inf + 1, auth:true})
+}else{
+    const data = await movies.findOneAndUpdate(
+        {
+          _id: id,
+          "comment._id": req.body.comment.id, // Ensures that the reply does not already exist
+        },
+        {
+          $push: {
+            "comment.$.reply": {
+              chat: comments.chat,
+              name: users.user_name,
+              id_user: users._id,
+              profile_image: users.profile_image,
+              reaction: 0,
+              rank: users.rank,
+              re: false,
+            },
+          },
+        },
+        { new: true }
+      );
+    const inf = data?.comment?.length
+    return res.json({no:inf + 1, auth:true})
+
+}
     }
     catch(e)
     {
@@ -347,4 +746,114 @@ const postComment = async(req, res) =>{
 
 }
 
-module.exports = {getGames, pushGames, findGames, listGames, getMoviescate, postComment, deleteMovies, pushSeason, createGroup, pushgroupcomment ,getGroup, userData, loginIn, getGroupSlice }
+
+const deleteComment = async(req, res)=>{
+   try{
+    const id = req.params.id
+    const user = req.query.ids
+    const movie = await movies.findOne({ "comment._id": id });
+    if (!movie) {
+        return res.status(404).json({ message: "Reply not found" });
+    }
+
+    const commentIndex = movie.comment.findIndex(comment =>
+        comment._id.toString() == id
+    );
+    if(movie.comment[commentIndex].id_user !== user)
+    {
+        return  res.status(200).json({ message: true });
+    }
+    await movies.findOneAndUpdate({"comment._id":id},
+    { $pull: { comment: { _id: id } } })
+
+    
+        res.status(200).json({ message: true });
+   
+   }
+   catch (error) {
+    console.error("Error deleting comment:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+}
+}
+
+const deleteoneComment = async(req, res)=>{
+    
+    try{
+     const id = req.params.id
+     const user = req.query.ids
+     const movie = await movies.findOne({  "comment.reply._id": id});
+     if (!movie) {
+         return res.status(404).json({ message: "Reply not found" });
+     }
+     const commentIndex = movie.comment.findIndex(comment =>
+        comment.reply.some(reply => reply._id.toString() === id)
+    );
+   
+    const replyIndex = movie.comment[commentIndex].reply.findIndex(reply =>
+        reply._id.toString() === id
+    );
+ 
+    const info =  movie.comment[commentIndex].reply[replyIndex]
+   
+    if(info.id_user !== user)
+    {
+    return res.status(200).json({ message: true });
+    }
+
+     await movies.findOneAndUpdate({"comment.reply._id":id},
+     { $pull: { "comment.$.reply": { _id: id } } })
+ 
+        
+         res.status(200).json({ message: true });
+    
+    }
+    catch (error) {
+     console.error("Error deleting comment:", error);
+     res.status(500).json({ message: "Internal Server Error" });
+ }
+ }
+
+const loginInAd = async(req, res)=>{
+   
+    try{
+        const emailinfo = req.body.email.toUpperCase()
+        const info = await user.findOne({email:emailinfo})
+        if(info == null){
+            return res.json({auth:false,message:"Email Not Found"})
+        }
+
+        if(!info.admin)
+        {
+            return res.json({auth:false, message:"Dont have Access"})
+        }
+        const result = await bcrypt.compare(req.body.password, info.password)
+        if (result)
+        {
+            const id = info._id
+            const token = JWT.sign({id}, process.env.JWTT)
+            const userdata = {user_name:info.user_name, _id:info._id, admin:info.admin, group_access:info.group_access, profile_image:info.profile_image, rank:info.rank, notification:info.notification, suspend:info.suspend, ban:info.ban}
+            return res.json({auth:true, token:token, data:userdata})
+        }
+        else{
+            return res.json({auth:false, message:'Password Wrong'})
+        }
+        }
+        catch(e)
+        {
+            console.log(e)
+        }
+}
+
+const latest =async (req, res) =>{
+    try{
+    const data = await movies.find({series:true}).sort({"updatedAt": -1}).limit(50)
+    res.json(data)
+
+    }
+    catch(e)
+    {
+        console.log(e)
+    }
+}
+
+module.exports = {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, deleteMovies, userData, loginIn ,getUser, pushUsers , changePass, notify, loginInAd, Searchmovie,  editMovie , pushSeries, deletemovie, deleteComment, deleteoneComment, upcomingPush, latest, findMovie, check, Search }

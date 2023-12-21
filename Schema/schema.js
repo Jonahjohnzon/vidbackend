@@ -8,10 +8,6 @@ const notification = mongoose.Schema({
     data:{
         type:Date
     , default: Date.now},
-    active:{
-        type:Boolean
-    }
-
 })
 const video = mongoose.Schema({
     title:{
@@ -31,16 +27,6 @@ const video = mongoose.Schema({
     }
 })
 
-const follow = mongoose.Schema({
-    name:{
-        type:String
-    },
-    user_id:{
-        type:String},
-    profile:{
-        type:String
-    }
-})
 
 const user = mongoose.Schema({
     user_name:{
@@ -76,72 +62,42 @@ const user = mongoose.Schema({
     ban:{
         type:Boolean
     },
-    followers:[follow],
-    followings:[follow],
     videos:[video]
-})
+},{timestamps:true})
 
-const groupcomment = mongoose.Schema({
-    name:{
-        type:String
-    },
-    user_id:{
-        type:String
-    },
-    chat:{
-        type:String
-    },
-    profile_image:{
-        type:String
-    }
-    ,
-    data:{
-        type:Date
-    , default: Date.now},
-    reaction:{
-        type:Number
-    },
-    title:{
-        type:Boolean
-    },
-    link:{
-        type:String
-    },
-    titles:{
-        type:String
-    },
-    wordings:{
-        type:String
-    },
-    rank:{
-        type:Number
-    },
-    star:{
-        type:Number
-    }
 
-})
 
-const groups = mongoose.Schema({
-    title:{
-        type:String
-    },
-    subtitle:{
-        type:String
-    },
-    owner:{
-        type:String
-    },
-    comment:[groupcomment],
-    profile:{
-        type:String
-    }
-})
 
 const type = mongoose.Schema({
     a:{type:String},
     b:{type:String},
     c:{type:String}
+})
+const  reply = mongoose.Schema({
+    chat:{
+        type:String
+    },
+    name:{
+        type:String
+    },
+    id_user:{
+        type:String
+    },
+      profile_image:{
+        type:String
+    },
+    reaction:{
+        type:Number
+    },
+    data:{
+        type:Date
+    , default: Date.now},
+    rank:{
+        type:Number
+    },
+    re:{
+        type:Boolean
+    }
 })
 
 const comment = mongoose.Schema({
@@ -162,22 +118,26 @@ const comment = mongoose.Schema({
     },
     data:{
         type:Date
-    , default: Date.now}
+    , default: Date.now},
+    rank:{
+        type:Number
+    },
+    reply:[reply],
+    re:{
+        type:Boolean
+    }
 })
 
 const episode = mongoose.Schema({
-        no:{
-            type:Number
-        },
+    no:{
+        type:Number
+    },
         link:{
             type:String
         }
 })
 
 const season_no = mongoose.Schema({
-        number:{
-            type:Number
-        },
         episode:[episode]
 })
 
@@ -190,7 +150,7 @@ const movies = mongoose.Schema({
             type:String
         },
         year:{
-            type:String
+            type:Number
         },
         type:type,
         runtime:{
@@ -212,8 +172,19 @@ const movies = mongoose.Schema({
         top:{
             type:Boolean
         },
-        download:{
-            type:String
+        lowdownload:{
+            size:{
+            type:Number},
+            link:{
+                type:String   
+            }
+        },
+        highdownload:{
+            size:{
+                type:Number},
+                link:{
+                    type:String   
+                }
         },
         trailer:{
             type:String
@@ -221,14 +192,12 @@ const movies = mongoose.Schema({
         category:{
             type:String
         },
-        data:{
-            type:Date
-        , default: Date.now},
         series:{
             type:Boolean
         },
-        seasons:[season_no]
-})
+        seasons:[season_no],
+        
+},{timestamps:true})
 
 const upcoming = mongoose.Schema({
     title:{
@@ -242,7 +211,8 @@ const upcoming = mongoose.Schema({
     }
 })
 
+
 module.exports.movies = mongoose.model('movies', movies)
 module.exports.upcoming = mongoose.model('upcoming', upcoming)
 module.exports.user = mongoose.model('user', user)
-module.exports.groups = mongoose.model('groups', groups)
+

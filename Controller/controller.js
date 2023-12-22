@@ -80,7 +80,7 @@ const getMoviescate = async(req,res)=>{
     const hollywood = datah.reverse().slice(0, 6)
     const datab= await movies.find({category:"bollywood",series:false})
     const bollywood = datab.reverse().slice(0, 6)
-    const datatop = await movies.find({top:true}).sort({"updatedAt": -1}).limit(3y)
+    const datatop = await movies.find({top:true}).sort({"updatedAt": -1}).limit(3)
     const top = datatop.reverse().slice(0,3)
     const trailer = await upcoming.find({})
     const asian = await movies.find({category:"asianseries"}).sort({"updatedAt": -1}).limit(5)

@@ -80,7 +80,7 @@ const getMoviescate = async(req,res)=>{
     const hollywood = datah.reverse().slice(0, 6)
     const datab= await movies.find({category:"bollywood",series:false})
     const bollywood = datab.reverse().slice(0, 6)
-    const datatop = await movies.find({top:true}).sort({"updatedAt": -1}).limit(3)
+    const datatop = await movies.find({top:true}).sort({"updatedAt": -1}).limit(3y)
     const top = datatop.reverse().slice(0,3)
     const trailer = await upcoming.find({})
     const asian = await movies.find({category:"asianseries"}).sort({"updatedAt": -1}).limit(5)
@@ -262,25 +262,88 @@ const loginIn = async(req, res) =>{
     
 }
 
-const getUser = async(req, res)=>{
-    const id = req.params.id
-    try{
-    const info = await user.findOne({_id: id})
-    const result ={
-        user_name:info.user_name,
-        email:info.email,
-        profile_image:info.profile_image,
-        rank:info.rank,
-        videos:info.videos,
-        notification:info.notification.alarm,
-        _id:info._id
+const getUser = async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        // Fetch the user information
+        const info = await user.findOne({ _id: id });
+
+        // Check if the account was created more than one month ago
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+        // Check if the account was created more than three months ago
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+        // Check if the account was created more than six months ago
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+        // Check if the account was created more than one year ago
+        const oneYearAgo = new Date();
+        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+        // Check if the account was created more than one year and eight months ago
+        const oneYearEightMonthsAgo = new Date();
+        oneYearEightMonthsAgo.setFullYear(oneYearEightMonthsAgo.getFullYear() - 1);
+        oneYearEightMonthsAgo.setMonth(oneYearEightMonthsAgo.getMonth() - 8);
+
+        // Check if the account was created more than three years ago
+        const threeYearsAgo = new Date();
+        threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
+
+        if (info.createdAt < oneMonthAgo) {
+            // Account was created more than one month ago, update rank to 10
+            info.rank = 10;
+            await info.save();
+            console.log("Account created more than one month ago. Rank updated to 10.");
+        } else if (info.createdAt < threeMonthsAgo) {
+            // Account was created more than three months ago, update rank to 30
+            info.rank = 30;
+            await info.save();
+            console.log("Account created more than three months ago. Rank updated to 30.");
+        } else if (info.createdAt < sixMonthsAgo) {
+            // Account was created more than six months ago, update rank to 80
+            info.rank = 80;
+            await info.save();
+            console.log("Account created more than six months ago. Rank updated to 80.");
+        } else if (info.createdAt < oneYearAgo) {
+            // Account was created more than one year ago, update rank to 150
+            info.rank = 150;
+            await info.save();
+            console.log("Account created more than one year ago. Rank updated to 150.");
+        } else if (info.createdAt < oneYearEightMonthsAgo) {
+            // Account was created more than one year and eight months ago, update rank to 300
+            info.rank = 300;
+            await info.save();
+            console.log("Account created more than one year and eight months ago. Rank updated to 300.");
+        } else if (info.createdAt < threeYearsAgo) {
+            // Account was created more than three years ago, update rank to 500
+            info.rank = 500;
+            await info.save();
+            console.log("Account created more than three years ago. Rank updated to 500.");
+        }
+
+        // Prepare the response object
+        const result = {
+            user_name: info.user_name,
+            email: info.email,
+            profile_image: info.profile_image,
+            rank: info.rank,
+            videos: info.videos,
+            notification: info.notification.alarm,
+            _id: info._id,
+        };
+
+        return res.json(result);
+    } catch (e) {
+        console.log(e);
+        // Handle the error appropriately
     }
-    return res.json(result)
-    }
-    catch(e){
-        console.log(e)
-    }
-}
+};
+
 
 const deleteMovies = async (req, res) => {
    
@@ -846,7 +909,7 @@ const loginInAd = async(req, res)=>{
 
 const latest =async (req, res) =>{
     try{
-    const data = await movies.find({series:true}).sort({"updatedAt": -1}).limit(50)
+    const data = await movies.find({series:true}).sort({"updatedAt": -1}).limit(30)
     res.json(data)
 
     }

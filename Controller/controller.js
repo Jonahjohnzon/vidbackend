@@ -813,7 +813,7 @@ const postComment = async(req, res) =>{
     return res.json({no:inf + 1, auth:true})
       }
       else{
-        return
+        return res.json({no:inf, auth:true})
       }
 
 }

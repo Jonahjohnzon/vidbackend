@@ -298,32 +298,26 @@ const getUser = async (req, res) => {
             // Account was created more than one month ago, update rank to 10
             info.rank = 10;
             await info.save();
-            console.log("Account created more than one month ago. Rank updated to 10.");
         } else if (info.createdAt >= threeMonthsAgo && info.createdAt < sixMonthsAgo) {
             // Account was created more than three months ago, update rank to 30
             info.rank = 30;
             await info.save();
-            console.log("Account created more than three months ago. Rank updated to 30.");
         } else if (info.createdAt >= sixMonthsAgo && info.createdAt < oneYearAgo) {
             // Account was created more than six months ago, update rank to 80
             info.rank = 80;
             await info.save();
-            console.log("Account created more than six months ago. Rank updated to 80.");
         } else if (info.createdAt >= oneYearAgo && info.createdAt < oneYearEightMonthsAgo) {
             // Account was created more than one year ago, update rank to 150
             info.rank = 150;
             await info.save();
-            console.log("Account created more than one year ago. Rank updated to 150.");
         } else if (info.createdAt >= oneYearEightMonthsAgo && info.createdAt < threeYearsAgo) {
             // Account was created more than one year and eight months ago, update rank to 300
             info.rank = 300;
             await info.save();
-            console.log("Account created more than one year and eight months ago. Rank updated to 300.");
         } else if (info.createdAt >= threeYearsAgo) {
             // Account was created more than three years ago, update rank to 500
             info.rank = 500;
             await info.save();
-            console.log("Account created more than three years ago. Rank updated to 500.");
         }
 
         // Prepare the response object

@@ -316,7 +316,7 @@ const getUser = async (req, res) => {
         const threeYearsAgo = new Date();
         threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
 
-        if (info.createdAt <= oneMonthAgo  && !(info.createdAt < threeMonthsAgo)) {
+        if (info?.createdAt <= oneMonthAgo  && !(info.createdAt < threeMonthsAgo)) {
             // Account was created more than one month ago, update rank to 10
             info.rank = 10;
             await info.save();
@@ -785,10 +785,12 @@ const postComment = async(req, res) =>{
     const inf = data.comment.length
     return res.json({no:inf + 1, auth:true})
 }else{
+
     const data = await movies.findOneAndUpdate(
         {
           _id: id,
           "comment._id": req.body.comment.id, // Ensures that the reply does not already exist
+          "comment.reply": { $exists: true, $size: { $lt: 1 } },
         },
         {
           $push: {

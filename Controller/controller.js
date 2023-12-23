@@ -807,8 +807,14 @@ const postComment = async(req, res) =>{
         },
         { new: true }
       );
+      if(data)
+      {
     const inf = data?.comment?.length
     return res.json({no:inf + 1, auth:true})
+      }
+      else{
+        return
+      }
 
 }
     }

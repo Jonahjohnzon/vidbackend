@@ -1,7 +1,7 @@
 const {  user, movies, upcoming } = require("../Schema/schema");
 const JWT = require('jsonwebtoken') 
 const bcrypt = require('bcrypt');
-const { search } = require("../Routes/routes");
+
 
 
 const getMovies = async(req,res)=>{
@@ -349,16 +349,6 @@ const getUser = async (req, res) => {
 };
 
 
-const deleteMovies = async (req, res) => {
-   
-    try{ 
-    await movies.deleteMany({})
-        return res.json("done")
-    }
-    catch(e){
-        console.log(e)
-    }
-}
 
 const pushMovie = async (req, res) => {
     try{
@@ -923,4 +913,4 @@ const latest =async (req, res) =>{
     }
 }
 
-module.exports = {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, deleteMovies, userData, loginIn ,getUser, pushUsers , changePass, notify, loginInAd, Searchmovie,  editMovie , pushSeries, deletemovie, deleteComment, deleteoneComment, upcomingPush, latest, findMovie, check, Search }
+module.exports = {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, userData, loginIn ,getUser, pushUsers , changePass, notify, loginInAd, Searchmovie,  editMovie , pushSeries, deletemovie, deleteComment, deleteoneComment, upcomingPush, latest, findMovie, check, Search }

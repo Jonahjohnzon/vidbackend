@@ -790,7 +790,7 @@ const postComment = async(req, res) =>{
         {
           _id: id,
           "comment._id": req.body.comment.id, // Ensures that the reply does not already exist
-          "comment.reply": { $exists: true, $size: { $lt: 1 } },
+          "comment.reply": { $size: { $lt: 1 } },
         },
         {
           $push: {

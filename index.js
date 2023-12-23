@@ -6,7 +6,7 @@ const router = require('./Routes/routes')
 require('dotenv').config()
 app.use(cors())
 mongoose()
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 2087
 
 app.use(require('express').json())
 app.use('/', router)

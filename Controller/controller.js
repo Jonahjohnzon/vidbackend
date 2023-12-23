@@ -108,6 +108,7 @@ const userData = async(req, res)=>{
     const hash = await bcrypt.hash(pass, salt)
     const email = req.body.email.toUpperCase()
     const useraccount = await user.find({email:email})
+    const username = await user.find({user_name:req.body.user_name})
     if(req.body.password !== req.body.comfirmpassword)
     {
         return res.json({create:false, message:"Password Does not Match"})
@@ -115,6 +116,11 @@ const userData = async(req, res)=>{
     if(useraccount.length > 0)
     {
         return res.json({create:false,message:"Email Already Exist"})
+    }
+    
+    if(username.length > 0)
+    {
+        return res.json({create:false,message:"Username Already Exist"})
     }
     try{    
     const data = await user.create({
@@ -166,11 +172,27 @@ const check = async (req, res) => {
 
 const pushUsers = async(req,res)=>{
     try{const id = req.params.id
+    const name = await user.findOne({_id:id})
+    if(name.user_name == req.body.user_name)
+    {
     await user.findByIdAndUpdate({_id:id},{
         profile_image:req.body.profile_image,
         user_name:req.body.user_name
     })
     return res.json({update:true})
+}
+else{
+    const usernam = await user.find({ user_name:req.body.user_name})
+    if(usernam.length > 0)
+    { return res.json({update:false, mgs:"Username Already Exist"})}
+    else{
+        await user.findByIdAndUpdate({_id:id},{
+            profile_image:req.body.profile_image,
+            user_name:req.body.user_name
+        })
+        return res.json({update:true})
+    }
+}
 }
 catch(e){
     console.log(e)
@@ -708,15 +730,7 @@ const listMovies = async (req, res) =>{
         return res.json({auth:false})
     }
 }
-const Upcome = async(req, res)=>{
-    try{
-        const data = await upcoming.find({})
-        res.json(data)
-    }
-    catch(e){
-        console.log(e)
-    }
-}
+
 const upcomingPush = async(req, res)=>{
     try{
         const data = await upcoming.find({})

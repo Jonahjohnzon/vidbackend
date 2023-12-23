@@ -294,30 +294,40 @@ const getUser = async (req, res) => {
         const threeYearsAgo = new Date();
         threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
 
-        if (info.createdAt >= oneMonthAgo && info.createdAt < threeMonthsAgo) {
+        if (info.createdAt <= oneMonthAgo  && !(info.createdAt < threeMonthsAgo)) {
             // Account was created more than one month ago, update rank to 10
             info.rank = 10;
             await info.save();
-        } else if (info.createdAt >= threeMonthsAgo && info.createdAt < sixMonthsAgo) {
+           
+        } else if (info.createdAt <= threeMonthsAgo && !(info.createdAt < sixMonthsAgo)) {
             // Account was created more than three months ago, update rank to 30
             info.rank = 30;
             await info.save();
-        } else if (info.createdAt >= sixMonthsAgo && info.createdAt < oneYearAgo) {
+           
+        } else if (info.createdAt <= sixMonthsAgo && !(info.createdAt < oneYearAgo)) {
             // Account was created more than six months ago, update rank to 80
             info.rank = 80;
             await info.save();
-        } else if (info.createdAt >= oneYearAgo && info.createdAt < oneYearEightMonthsAgo) {
+            
+        } else if (info.createdAt <= oneYearAgo && !(info.createdAt < oneYearEightMonthsAgo)) {
             // Account was created more than one year ago, update rank to 150
             info.rank = 150;
             await info.save();
-        } else if (info.createdAt >= oneYearEightMonthsAgo && info.createdAt < threeYearsAgo) {
+            
+        } else if (info.createdAt <= oneYearEightMonthsAgo && !(info.createdAt < threeYearsAgo)) {
             // Account was created more than one year and eight months ago, update rank to 300
             info.rank = 300;
             await info.save();
-        } else if (info.createdAt >= threeYearsAgo) {
+            
+        } else if (info.createdAt <= threeYearsAgo) {
             // Account was created more than three years ago, update rank to 500
             info.rank = 500;
             await info.save();
+
+        }
+        else{
+            info.rank = 1
+            await info.save()
         }
 
         // Prepare the response object

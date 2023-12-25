@@ -171,7 +171,7 @@ const verifyemailtoken = async (req, res)=>{
         return res.json({auth:true, mgs:"Email verified"})
     }
     catch(e){
-        return res.json({auth:true, mgs:"Authentication Error, Sign-Up Again"})
+        return res.json({auth:true, mgs:"Authentication Error,   Sign-Up Again"})
     } 
    
 
@@ -320,9 +320,8 @@ const getUser = async (req, res) => {
         // Fetch the user information
         const info = await user.findOne({ _id: id });
         if(!info){
-            return res(false)
+            return res.json({auth:false})
     }
-
         // Check if the account was created more than one month ago
         const oneMonthAgo = new Date();
         oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);

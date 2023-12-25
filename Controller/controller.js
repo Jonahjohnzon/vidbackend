@@ -1,4 +1,4 @@
-const {  user, movies, upcoming } = require("../Schema/schema");
+const {  user, movies, upcoming } = require("../Schema/schema.js");
 const JWT = require('jsonwebtoken') 
 const bcrypt = require('bcrypt');
 

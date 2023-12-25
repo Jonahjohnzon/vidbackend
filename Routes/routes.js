@@ -27,4 +27,5 @@ router.delete("/deletemovie/:id",verifyJwtad, deletemovie)
 router.delete("/deleteComment/:id",verifyJwt, deleteComment)
 router.delete("/deleteoneComment/:id",verifyJwt, deleteoneComment)
 router.post("/upcomingPush",verifyJwtad, upcomingPush)
+router.get("/emailverify/:token" ,verifyemailtoken)
 module.exports = router

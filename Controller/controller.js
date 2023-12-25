@@ -1,6 +1,7 @@
 const {  user, movies, upcoming } = require("../Schema/schema.js");
 const JWT = require('jsonwebtoken') 
 const bcrypt = require('bcrypt');
+const verifyEmail = require('./email.js');
 
 
 
@@ -136,12 +137,18 @@ const userData = async(req, res)=>{
                     message:"🌟 Welcome to the Movie community! Dive into discussions, share your passion, and make yourself at home. Enjoy your stay! 🚀",
                 },
                 alarm:true},
-            suspend:false,
+            suspend:true,
             ban:false,
             videos:[]
         })
          await data.save()
-         return res.json({create:true, message:"Account Create"})
+         const emailtoken = JWT.sign({email}, process.env.EMI, { expiresIn: '1h' })
+         verifyEmail.verifyEmail({
+            userEmail: email,
+            username: req.body.user_name,
+            token: emailtoken
+          })
+         return res.json({create:true, message:"Activation key sent to your Email"})
     }
         catch(e)
         {
@@ -150,6 +157,25 @@ const userData = async(req, res)=>{
         }
     
 }
+
+const verifyemailtoken = async (req, res)=>{
+    const token = req.params.token
+    
+    try{
+        const verifyWithJWTS = JWT.verify(token, process.env.EMI);
+         await user.findOneAndUpdate({email: verifyWithJWTS.email},{
+            $set:{
+                suspend:false
+            }
+        })
+        return res.json({auth:true, mgs:"Email verified"})
+    }
+    catch(e){
+        return res.json({auth:true, mgs:"Authentication Error, Sign-Up Again"})
+    } 
+   
+
+} 
 const check = async (req, res) => {
     try {
         const id = req.params.id;
@@ -268,6 +294,9 @@ const loginIn = async(req, res) =>{
     const result = await bcrypt.compare(req.body.password, info.password)
     if (result)
     {
+        if(info?.suspend){
+            return res.json({auth:false,message:"Please Verify Email"})
+        }
         const id = info._id
         const token = JWT.sign({id}, process.env.JWTS)
         const userdata = {user_name:info.user_name, _id:info._id, admin:info.admin, group_access:info.group_access, profile_image:info.profile_image, rank:info.rank, notification:info.notification, suspend:info.suspend, ban:info.ban}
@@ -936,4 +965,4 @@ const latest =async (req, res) =>{
     }
 }
 
-module.exports = {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, userData, loginIn ,getUser, pushUsers , changePass, notify, loginInAd, Searchmovie,  editMovie , pushSeries, deletemovie, deleteComment, deleteoneComment, upcomingPush, latest, findMovie, check, Search }
+module.exports = {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, userData, loginIn ,getUser, pushUsers , changePass, notify, loginInAd, Searchmovie,  editMovie , pushSeries, deletemovie, deleteComment, deleteoneComment, upcomingPush, latest, findMovie, check, Search, verifyemailtoken }

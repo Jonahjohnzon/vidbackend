@@ -24,7 +24,7 @@ module.exports ={
             
             }
             catch(e){
-                    console.log(e)
+              return res.json({create:false,message:"Something when wrong"})
             }
     }
 }

@@ -394,7 +394,7 @@ const getUser = async (req, res) => {
             _id: info._id,
         };
 
-        return res.json(result);
+        return res.json({data:result, auth:true});
     } catch (e) {
         console.log(e);
         // Handle the error appropriately

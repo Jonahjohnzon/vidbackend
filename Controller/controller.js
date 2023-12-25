@@ -319,6 +319,9 @@ const getUser = async (req, res) => {
     try {
         // Fetch the user information
         const info = await user.findOne({ _id: id });
+        if(!info){
+            return res(false)
+    }
 
         // Check if the account was created more than one month ago
         const oneMonthAgo = new Date();

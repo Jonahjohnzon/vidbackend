@@ -433,6 +433,12 @@ const passwordchange = async(req, res)=>{
     }
     try{
     const verifyWithJWTS = JWT.verify(token, process.env.CHAP);
+    const data = await user.findOne({email: verifyWithJWTS.email})
+    const result = await bcrypt.compare(password, data.password)
+    if(result)
+    {
+        return res.json({auth:true, mgs:"Can't Change To Current Password"})
+    }
     const salt = await bcrypt.genSalt()
     const hash = await bcrypt.hash(password, salt)
     await user.findOneAndUpdate({email: verifyWithJWTS.email},{
@@ -444,7 +450,7 @@ const passwordchange = async(req, res)=>{
 
     }
     catch(e){
-        return res.json({auth:true, mgs:"Authentication Failed"})
+        return res.json({auth:true, mgs:"Link Authentication Failed"})
     }
 }
 

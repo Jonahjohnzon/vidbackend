@@ -403,6 +403,27 @@ const getUser = async (req, res) => {
 };
 
 
+const passchange = async(req, res)=>{
+    try{
+    const email = req.body.email.toUpperCase()
+    const data = await user.findOne({email: email})
+    if (data)
+    {
+        const emailtoken = JWT.sign({email}, process.env.CHAP, { expiresIn: '1h' })
+        verifyEmail.verifyPass({
+           userEmail: email,
+           token: emailtoken
+         })
+        return res.json({auth:true, message:"Activation Link Sent To Your Email"})
+    }
+    else{
+        return res.json({auth:false, mgs:"Email Doesnt Exist"})
+    }
+}catch(e){
+    console.log(e)
+}
+}
+
 
 const pushMovie = async (req, res) => {
     try{
@@ -968,4 +989,4 @@ const latest =async (req, res) =>{
     }
 }
 
-module.exports = {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, userData, loginIn ,getUser, pushUsers , changePass, notify, loginInAd, Searchmovie,  editMovie , pushSeries, deletemovie, deleteComment, deleteoneComment, upcomingPush, latest, findMovie, check, Search, verifyemailtoken }
+module.exports = {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, userData, loginIn ,getUser, pushUsers , changePass, notify, loginInAd, Searchmovie,  editMovie , pushSeries, deletemovie, deleteComment, deleteoneComment, upcomingPush, latest, findMovie, check, Search, verifyemailtoken, passchange }

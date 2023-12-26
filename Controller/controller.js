@@ -414,7 +414,7 @@ const passchange = async(req, res)=>{
            userEmail: email,
            token: emailtoken
          })
-        return res.json({auth:true, message:"Activation Link Sent To Your Email"})
+        return res.json({auth:true, mgs:"Activation Link Sent To Your Email"})
     }
     else{
         return res.json({auth:false, mgs:"Email Doesnt Exist"})

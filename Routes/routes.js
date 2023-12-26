@@ -28,5 +28,5 @@ router.delete("/deleteComment/:id",verifyJwt, deleteComment)
 router.delete("/deleteoneComment/:id",verifyJwt, deleteoneComment)
 router.post("/upcomingPush",verifyJwtad, upcomingPush)
 router.get("/emailverify/:token" ,verifyemailtoken)
-router.post("password",passchange)
+router.post("/password",passchange)
 module.exports = router

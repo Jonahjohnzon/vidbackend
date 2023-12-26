@@ -40,7 +40,7 @@ module.exports ={
       
       }
       catch(e){
-        return res.json({create:false,message:"Something when wrong"})
+        return res.json({auth:false,message:"Something when wrong"})
       }
 }
 }

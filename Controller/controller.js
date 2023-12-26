@@ -423,6 +423,31 @@ const passchange = async(req, res)=>{
 }
 }
 
+const passwordchange = async(req, res)=>{
+    const token = req.body.token
+    const comfirmpassword = req.body.copassword
+    const password = req.body.npassword
+    if (comfirmpassword !== password)
+    {
+        return res.json({auth:true, mgs:"Passwords Not the Same"})
+    }
+    try{
+    const verifyWithJWTS = JWT.verify(token, process.env.CHAP);
+    const salt = await bcrypt.genSalt()
+    const hash = await bcrypt.hash(password, salt)
+    await user.findOneAndUpdate({email: verifyWithJWTS.email},{
+        $set:{
+            password:hash
+        }
+    })
+    return res.json({auth:true, mgs:"Password Changed"})
+
+    }
+    catch(e){
+        return res.json({auth:true, mgs:"Authentication Failed"})
+    }
+}
+
 
 const pushMovie = async (req, res) => {
     try{
@@ -988,4 +1013,4 @@ const latest =async (req, res) =>{
     }
 }
 
-module.exports = {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, userData, loginIn ,getUser, pushUsers , changePass, notify, loginInAd, Searchmovie,  editMovie , pushSeries, deletemovie, deleteComment, deleteoneComment, upcomingPush, latest, findMovie, check, Search, verifyemailtoken, passchange }
+module.exports = {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, userData, loginIn ,getUser, pushUsers , changePass, notify, loginInAd, Searchmovie,  editMovie , pushSeries, deletemovie, deleteComment, deleteoneComment, upcomingPush, latest, findMovie, check, Search, verifyemailtoken, passchange,  passwordchange  }

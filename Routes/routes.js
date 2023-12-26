@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const verifyJwt = require('../Verification/verify.js')
 const verifyJwtad =  require('../VerificationAd/verifyad.js')
-const {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, userData, loginIn, getUser , pushUsers, changePass , notify , loginInAd, Searchmovie,  editMovie, pushSeries, deletemovie, deleteComment, deleteoneComment , upcomingPush, latest, findMovie , check, Search, verifyemailtoken, passchange} = require('../Controller/controller')
+const {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, userData, loginIn, getUser , pushUsers, changePass , notify , loginInAd, Searchmovie,  editMovie, pushSeries, deletemovie, deleteComment, deleteoneComment , upcomingPush, latest, findMovie , check, Search, verifyemailtoken, passchange,  passwordchange } = require('../Controller/controller')
 
 router.get('/get', getMovies)
 router.get('/getcate', getMoviescate)
@@ -29,4 +29,5 @@ router.delete("/deleteoneComment/:id",verifyJwt, deleteoneComment)
 router.post("/upcomingPush",verifyJwtad, upcomingPush)
 router.get("/emailverify/:token" ,verifyemailtoken)
 router.post("/password",passchange)
+router.post("/passchange",  passwordchange )
 module.exports = router

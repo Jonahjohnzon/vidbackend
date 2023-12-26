@@ -314,6 +314,17 @@ const loginIn = async(req, res) =>{
 }
 
 const getUser = async (req, res) => {
+        try {
+          const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000); // One hour ago
+          await user.deleteMany({
+            suspend: true,
+            createdAt: { $lt: oneHourAgo },
+          });
+          
+        } catch (error) {
+          console.error('Error deleting unverified users:', error);
+        }
+     
     const id = req.params.id;
 
     try {
@@ -1019,20 +1030,9 @@ const latest =async (req, res) =>{
     }
 }
 
-const deleteUnverifiedUsers = async () => {
-    try {
-      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000); // One hour ago
-      await user.deleteMany({
-        suspend: true,
-        createdAt: { $lt: oneHourAgo },
-      });
-      
-    } catch (error) {
-      console.error('Error deleting unverified users:', error);
-    }
-  };
+
   
   // Schedule the function to run every hour
-setInterval(deleteUnverifiedUsers, 60 * 60 * 1000);
+
 
 module.exports = {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, userData, loginIn ,getUser, pushUsers , changePass, notify, loginInAd, Searchmovie,  editMovie , pushSeries, deletemovie, deleteComment, deleteoneComment, upcomingPush, latest, findMovie, check, Search, verifyemailtoken, passchange,  passwordchange  }

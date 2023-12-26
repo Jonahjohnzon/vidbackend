@@ -145,7 +145,6 @@ const userData = async(req, res)=>{
          const emailtoken = JWT.sign({email}, process.env.EMI, { expiresIn: '1h' })
          verifyEmail.verifyEmail({
             userEmail: email,
-            username: req.body.user_name,
             token: emailtoken
           })
          return res.json({create:true, message:"Activation Link Sent To Your Email"})

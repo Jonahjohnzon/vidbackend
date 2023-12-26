@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 });
 
 module.exports ={
-    verifyEmail: async function verifyEmail({userEmail, username, token}){
+    verifyEmail: async function verifyEmail({userEmail, token}){
             try{
               
                  await transporter.sendMail({

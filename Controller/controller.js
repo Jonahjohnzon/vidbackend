@@ -170,7 +170,7 @@ const verifyemailtoken = async (req, res)=>{
         return res.json({auth:true, mgs:"Email verified"})
     }
     catch(e){
-        return res.json({auth:true, mgs:"Authentication Error,   Sign-Up Again"})
+        return res.json({auth:true, mgs:"Authentication Error, Sign Up Again"})
     } 
    
 
@@ -1018,5 +1018,25 @@ const latest =async (req, res) =>{
         console.log(e)
     }
 }
+
+const deleteUnverifiedUsers = async () => {
+    try {
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000); // One hour ago
+      const unverifiedUsers = await user.find({
+        suspend: true,
+        createdAt: { $lt: oneHourAgo },
+      });
+  
+      for (const users of unverifiedUsers) {
+        await user.deleteOne({ _id: users._id }); // Using deleteOne to delete a single document;
+      }
+      
+    } catch (error) {
+      console.error('Error deleting unverified users:', error);
+    }
+  };
+  
+  // Schedule the function to run every hour
+setInterval(deleteUnverifiedUsers, 60 * 60 * 1000);
 
 module.exports = {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, userData, loginIn ,getUser, pushUsers , changePass, notify, loginInAd, Searchmovie,  editMovie , pushSeries, deletemovie, deleteComment, deleteoneComment, upcomingPush, latest, findMovie, check, Search, verifyemailtoken, passchange,  passwordchange  }

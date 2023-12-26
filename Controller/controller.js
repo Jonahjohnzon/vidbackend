@@ -1022,14 +1022,10 @@ const latest =async (req, res) =>{
 const deleteUnverifiedUsers = async () => {
     try {
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000); // One hour ago
-      const unverifiedUsers = await user.find({
+      await user.deleteMany({
         suspend: true,
         createdAt: { $lt: oneHourAgo },
       });
-  
-      for (const users of unverifiedUsers) {
-        await user.deleteOne({ _id: users._id }); // Using deleteOne to delete a single document;
-      }
       
     } catch (error) {
       console.error('Error deleting unverified users:', error);

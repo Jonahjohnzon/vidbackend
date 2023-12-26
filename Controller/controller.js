@@ -148,7 +148,7 @@ const userData = async(req, res)=>{
             username: req.body.user_name,
             token: emailtoken
           })
-         return res.json({create:true, message:"Activation key sent to your Email"})
+         return res.json({create:true, message:"Activation Link Sent To Your Email"})
     }
         catch(e)
         {
@@ -225,26 +225,27 @@ catch(e){
 }}
 
 const notify = async(req,res)=>{
-   try{
-    const id = req.params.id
-    const data = await user.findOne({_id:id})
-    const notice = data.notification
-    if(notice.alarm)
+    try{
+     const id = req.params.id
+     const data = await user.findOne({_id:id})
+     const notice = data.notification
+     if(notice.alarm)
+     {
+     await user.findByIdAndUpdate({_id:id},{
+         $set:{
+             "notification.alarm":false
+             
+         }
+         
+     })}
+     return res.json({mgs:notice, auth:true
+     })
+    }
+    catch(e)
     {
-    await user.findByIdAndUpdate({_id:id},{
-        $set:{
-            "notification.alarm":false
-            
-        }
-        
-    })}
-    return res.json(notice)
-   }
-   catch(e)
-   {
-    console.log(e)
-   }
-}
+     console.log(e)
+    }
+ }
 
 const changePass = async (req,res) =>{
     try{
@@ -295,7 +296,7 @@ const loginIn = async(req, res) =>{
     if (result)
     {
         if(info?.suspend){
-            return res.json({auth:false,message:"Please Verify Email"})
+            return res.json({auth:false,message:"Please Verify Email First"})
         }
         const id = info._id
         const token = JWT.sign({id}, process.env.JWTS)

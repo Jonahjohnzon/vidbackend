@@ -23,7 +23,9 @@ const secure = https.createServer({
     cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem')),
 }, app);
 
-
+secure.on('error', error => {
+    console.error('Server error:', error);
+});
 secure.listen(port,()=>{
     console.log('Connected to port ' + port)
 })

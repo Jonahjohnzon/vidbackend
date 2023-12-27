@@ -314,6 +314,8 @@ const loginIn = async(req, res) =>{
 }
 
 const getUser = async (req, res) => {
+    res.header('Access-Control-Allow-Origin', 'https://vidnaija.com.ng');
+    res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
         try {
           const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000); // One hour ago
           await user.deleteMany({

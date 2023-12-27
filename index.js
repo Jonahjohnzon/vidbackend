@@ -12,14 +12,20 @@ app.use(cors());
 mongoose();
 
 // Middleware to set X-Forwarded-Host header
-
+app.use((req, res, next) => {
+    res.setHeader('X-Forwarded-Host', req.hostname);
+    next();
+});
 
 app.use(require('express').json());
 app.use('/', router);
 
-
+const secure = https.createServer({
+    key: fs.readFileSync(path.join(__dirname, 'cert', 'key.pem')),
+    cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem')),
+}, app);
 
 const port = process.env.PORT || 5000;
-app.listen(port, () => {
+secure.listen(port, () => {
     console.log('Connected to port ' + port);
 });

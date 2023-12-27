@@ -11,11 +11,6 @@ require('dotenv').config();
 app.use(cors());
 mongoose();
 
-// Middleware to set X-Forwarded-Host header
-app.use((req, res, next) => {
-    res.setHeader('X-Forwarded-Host', req.hostname);
-    next();
-});
 
 app.use(require('express').json());
 app.use('/', router);

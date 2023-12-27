@@ -8,13 +8,7 @@ const router = require('./Routes/routes.js');
 const path = require('path');
 require('dotenv').config();
 
-const corsOptions ={
-    origin:'*', 
-    credentials:true,            //access-control-allow-credentials:true
-    optionSuccessStatus:200,
- }
-
-app.use(cors(corsOptions));
+app.use(cors());
 mongoose();
 
 // Middleware to set X-Forwarded-Host header

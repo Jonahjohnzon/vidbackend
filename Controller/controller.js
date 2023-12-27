@@ -76,7 +76,6 @@ const Search = async(req, res)=>{
     }
 }
 const getMoviescate = async(req,res)=>{
-    console.log("reached")
     try{
     const datah = await movies.find({category:"hollywood",series:false})
     const hollywood = datah.reverse().slice(0, 6)

@@ -14,6 +14,12 @@ const corsOptions = {
 app.use(cors(corsOptions))
 mongoose()
 const port = process.env.PORT || 5000
+app.use('/', (req, res, next) => {
+    console.log('Request headers:', req.headers);
+    next();
+  });
+  
+  app.use('/', router);
 
 app.use(require('express').json())
 app.use('/', router)

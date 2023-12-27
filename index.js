@@ -8,7 +8,7 @@ const router = require('./Routes/routes.js')
 const path = require('path')
 require('dotenv').config()
 const corsOptions = {
-    origin: 'https://vidnaija.com.ng',
+    origin: 'http://vidnaija.com.ng',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   };
 app.use(cors(corsOptions))

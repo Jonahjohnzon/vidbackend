@@ -610,6 +610,31 @@ const findMovie = async (req, res) =>{
         return res.json({auth:false})
     }
     const comm = data.comment.slice(start,limit)
+                // Fetch user information for each comment and reply
+                for (const comment of comm) {
+                    const userId = comment.id_user;
+                    const userInfo = await user.findOne({ _id: userId });
+        
+                    // Update comment information with user data
+                    if (userInfo) {
+                        comment.name = userInfo.user_name;
+                        comment.profile_image = userInfo.profile_image;
+                        comment.rank = userInfo.rank;
+                    }
+        
+                    // Fetch user information for each reply
+                    for (const reply of comment.reply || []) {
+                        const replyUserId = reply.id_user;
+                        const replyUserInfo = await user.findOne({ _id: replyUserId });
+        
+                        // Update reply information with user data
+                        if (replyUserInfo) {
+                            reply.name = replyUserInfo.user_name;
+                            reply.profile_image = replyUserInfo.profile_image;
+                            reply.rank = replyUserInfo.rank;
+                        }
+                    }
+                }
     const infolength = data.comment.length
 
     if(data.series)

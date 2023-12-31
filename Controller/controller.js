@@ -577,8 +577,6 @@ const editMovie = async (req, res) => {
                 release: req.body.release,
                 image: req.body.image,
                 overview: req.body.overview,
-                comment: [],
-
                 trailer: req.body.trailer,
                 category: req.body.category,
                 top: false,

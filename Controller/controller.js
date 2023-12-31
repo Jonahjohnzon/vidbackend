@@ -18,7 +18,8 @@ const getMovies = async(req,res)=>{
 }
 
 const Searchmovie = async(req, res)=>{
-    const letter = req.params.searchmov
+    const lette = req.params.searchmov
+    const letter = lette.trim()
     if(letter == "")
     {
     
@@ -35,12 +36,12 @@ const Searchmovie = async(req, res)=>{
     }
 }
 const Search = async(req, res)=>{
-    const letter = req.params.search
+    const lette = req.params.search
     const cate = req.query.cate.toUpperCase()
     const type = req.query.type.toUpperCase()
     const limit = req.query.limit
     const start = req.query.start
-  
+    const letter = lette.trim()
     if(letter == "")
     {
     

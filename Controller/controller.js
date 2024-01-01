@@ -50,7 +50,7 @@ const Search = async(req, res)=>{
     try{
          if(cate != "ASIANSERIES" && cate != "ANIME" && cate != "TVSHOWS" && cate != "MOVIES"){
            
-        const resu = await movies.find({ title:{'$regex':`${letter}`, $options: 'i'},  category:cate.toLowerCase(), $or: [
+        const resu = await movies.find({ title:{'$regex':`${letter}`, $options: 'i'}, $or: [
             {"type.a": type},
             {"type.b": type},
             {"type.c": type}
@@ -61,7 +61,7 @@ const Search = async(req, res)=>{
          }
          else if(cate == "MOVIES")
          {
-            const resu = await movies.find({ title:{'$regex':`${letter}`, $options: 'i'}, series:false, category:type.toLowerCase()})
+            const resu = await movies.find({ title:{'$regex':`${letter}`, $options: 'i'}, series:false})
             const result = resu.reverse()
             const info = result.slice(start, limit)
             res.json({info:info, auth:true, length:result.length})

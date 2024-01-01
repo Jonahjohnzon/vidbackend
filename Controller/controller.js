@@ -26,7 +26,7 @@ const Searchmovie = async(req, res)=>{
         return res.json({data:[],auth:true})
     }
     try{
-        const result = await movies.find({ title:{ '$regex': `^${letter.split('').map(c => `(?=.*${c})`).join('')}.+$`, '$options': 'i' }})
+        const result = await movies.find({ title:{'$regex':`.*${letter.split('').join('.*')}.*`, $options: 'i'}})
         const modifiedResult = result.map(movie => ({ title: movie.title, _id: movie._id , series:movie.series}));
         res.json({data:modifiedResult, auth:true})
     }
@@ -50,7 +50,7 @@ const Search = async(req, res)=>{
     try{
          if(cate != "ASIANSERIES" && cate != "ANIME" && cate != "TVSHOWS" && cate != "MOVIES"){
            
-        const resu = await movies.find({ title:{ '$regex': `^${letter.split('').map(c => `(?=.*${c})`).join('')}.+$`, '$options': 'i' },  category:cate.toLowerCase(), $or: [
+        const resu = await movies.find({ title:{'$regex':`.*${letter.split('').join('.*')}.*`, $options: 'i'},  category:cate.toLowerCase(), $or: [
             {"type.a": type},
             {"type.b": type},
             {"type.c": type}
@@ -61,14 +61,14 @@ const Search = async(req, res)=>{
          }
          else if(cate == "MOVIES")
          {
-            const resu = await movies.find({ title:{ '$regex': `^${letter.split('').map(c => `(?=.*${c})`).join('')}.+$`, '$options': 'i' }, series:false, category:type.toLowerCase()})
+            const resu = await movies.find({ title:{'$regex':`.*${letter.split('').join('.*')}.*`, $options: 'i'}, series:false, category:type.toLowerCase()})
             const result = resu.reverse()
             const info = result.slice(start, limit)
             res.json({info:info, auth:true, length:result.length})
          }
          else{
             
-            const resu = await movies.find({ title:{ '$regex': `^${letter.split('').map(c => `(?=.*${c})`).join('')}.+$`, '$options': 'i' },  category:cate.toLowerCase()})
+            const resu = await movies.find({ title:{'$regex':`.*${letter.split('').join('.*')}.*`, $options: 'i'},  category:cate.toLowerCase()})
             const result = resu.reverse()
             const info = result.slice(start, limit)
             res.json({info:info, auth:true, length:result.length})

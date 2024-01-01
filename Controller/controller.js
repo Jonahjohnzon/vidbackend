@@ -56,19 +56,19 @@ const Search = async(req, res)=>{
             {"type.c": type}
           ]})
           const info = result.slice(start, limit)
-        res.json({info:info, auth:true, length:info.length})
+        res.json({info:info, auth:true, length:result.length})
          }
          else if(cate == "MOVIES")
          {
             const result = await movies.find({ title:{'$regex':`.*${letter.split('').join('.*')}.*`, $options: 'i'}, series:false, category:type.toLowerCase()})
             const info = result.slice(start, limit)
-            res.json({info:info, auth:true, length:info.length})
+            res.json({info:info, auth:true, length:result.length})
          }
          else{
             
             const result = await movies.find({ title:{'$regex':`.*${letter.split('').join('.*')}.*`, $options: 'i'},  category:cate.toLowerCase()})
             const info = result.slice(start, limit)
-            res.json({info:info, auth:true, length:info.length})
+            res.json({info:info, auth:true, length:result.length})
          }
     }
     catch(e){

@@ -26,7 +26,7 @@ const Searchmovie = async(req, res)=>{
         return res.json({data:[],auth:true})
     }
     try{
-        const result = await movies.find({ title:{'$regex':`${letter}`, $options: 'i'}})
+        const result = await movies.find({ title:{'$regex':`${letter}`, $options: 'i'}}).limit(5)
         const modifiedResult = result.map(movie => ({ title: movie.title, _id: movie._id , series:movie.series}));
         res.json({data:modifiedResult, auth:true})
     }

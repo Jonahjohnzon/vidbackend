@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const verifyJwt = require('../Verification/verify.js')
 const verifyJwtad =  require('../VerificationAd/verifyad.js')
-const {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, userData, loginIn, getUser , pushUsers, changePass , notify , loginInAd, Searchmovie,  editMovie, pushSeries, deletemovie, deleteComment, deleteoneComment , upcomingPush, latest, findMovie , check, Search, verifyemailtoken, passchange,  passwordchange } = require('../Controller/controller')
+const {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, userData, loginIn, getUser , pushUsers, changePass , notify , loginInAd, Searchmovie,  editMovie, pushSeries, deletemovie, deleteComment, deleteoneComment , upcomingPush, latest, findMovie , check, Search, verifyemailtoken, passchange,  passwordchange, homemovie  } = require('../Controller/controller')
 
 router.get('/get', getMovies)
 router.get('/getcate', getMoviescate)
@@ -21,6 +21,7 @@ router.put("/changePass/:id",verifyJwt, changePass)
 router.get("/notify/:id",verifyJwt, notify)
 router.get('/Searchmovie/:searchmov',verifyJwtad, Searchmovie)
 router.get('/Search/:search', Search)
+router.get('/homesearch/:search', homemovie  )
 router.put('/editMovie/:id',verifyJwtad, editMovie);
 router.put('/pushSeries/:id',verifyJwtad, pushSeries);
 router.delete("/deletemovie/:id",verifyJwtad, deletemovie)

@@ -35,6 +35,24 @@ const Searchmovie = async(req, res)=>{
 
     }
 }
+const homemovie = async(req, res)=>{
+    const lette = req.params.search
+    const letter = lette.trim()
+    if(letter == "")
+    {
+    
+        return res.json({data:[],auth:true})
+    }
+    try{
+        const result = await movies.find({ title:{'$regex':`${letter}`, $options: 'i'}}).limit(5)
+        const modifiedResult = result.map(movie => ({ title: movie.title, _id: movie._id , category:movie.category}));
+        res.json({data:modifiedResult, auth:true})
+    }
+    catch(e){
+        console.log(e)
+
+    }
+}
 const Search = async(req, res)=>{
     const lette = req.params.search
     const cate = req.query.cate.toUpperCase()
@@ -1065,4 +1083,4 @@ const latest =async (req, res) =>{
   // Schedule the function to run every hour
 
 
-module.exports = {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, userData, loginIn ,getUser, pushUsers , changePass, notify, loginInAd, Searchmovie,  editMovie , pushSeries, deletemovie, deleteComment, deleteoneComment, upcomingPush, latest, findMovie, check, Search, verifyemailtoken, passchange,  passwordchange  }
+module.exports = {getMovies, pushMovie, findMovies, listMovies, getMoviescate, postComment, userData, loginIn ,getUser, pushUsers , changePass, notify, loginInAd, Searchmovie,  editMovie , pushSeries, deletemovie, deleteComment, deleteoneComment, upcomingPush, latest, findMovie, check, Search, verifyemailtoken, passchange,  passwordchange ,homemovie }

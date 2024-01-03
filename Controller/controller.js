@@ -45,7 +45,7 @@ const homemovie = async(req, res)=>{
     }
     try{
         const result = await movies.find({ title:{'$regex':`${letter}`, $options: 'i'}}).limit(5)
-        const modifiedResult = result.map(movie => ({ title: movie.title, _id: movie._id , category:movie.category}));
+        const modifiedResult = result.map(movie => ({ title: movie.title, _id: movie._id }));
         res.json({data:modifiedResult, auth:true})
     }
     catch(e){

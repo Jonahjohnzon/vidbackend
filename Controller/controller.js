@@ -950,10 +950,7 @@ const postComment = async(req, res) =>{
             },
           },
         },
-        { new: true },
-        {
-          timestamps: false, // Disable automatic timestamps
-        }
+        { new: true,timestamps: false }
       );
       if(data)
       {

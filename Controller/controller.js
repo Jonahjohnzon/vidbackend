@@ -923,6 +923,9 @@ const postComment = async(req, res) =>{
                 re:true
             }
         }
+    },
+    {
+      timestamps: false, // Disable automatic timestamps
     })
     const inf = data.comment.length
     return res.json({no:inf + 1, auth:true})
@@ -947,7 +950,10 @@ const postComment = async(req, res) =>{
             },
           },
         },
-        { new: true }
+        { new: true },
+        {
+          timestamps: false, // Disable automatic timestamps
+        }
       );
       if(data)
       {
@@ -986,7 +992,10 @@ const deleteComment = async(req, res)=>{
         return  res.status(200).json({ message: true });
     }
     await movies.findOneAndUpdate({"comment._id":id},
-    { $pull: { comment: { _id: id } } })
+    { $pull: { comment: { _id: id } } },
+    {
+      timestamps: false, // Disable automatic timestamps
+    })
 
     
         res.status(200).json({ message: true });
@@ -1023,7 +1032,10 @@ const deleteoneComment = async(req, res)=>{
     }
 
      await movies.findOneAndUpdate({"comment.reply._id":id},
-     { $pull: { "comment.$.reply": { _id: id } } })
+     { $pull: { "comment.$.reply": { _id: id } } },
+     {
+       timestamps: false, // Disable automatic timestamps
+     })
  
         
          res.status(200).json({ message: true });

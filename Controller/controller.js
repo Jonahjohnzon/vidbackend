@@ -18,6 +18,7 @@ const getMovies = async(req,res)=>{
 }
 
 const Searchmovie = async(req, res)=>{
+    try{
     const lette = req.params.searchmov
     const letter = lette.trim()
     if(letter == "")
@@ -25,7 +26,7 @@ const Searchmovie = async(req, res)=>{
     
         return res.json({data:[],auth:true})
     }
-    try{
+    
         const result = await movies.find({ title:{'$regex':`${letter}`, $options: 'i'}}).limit(5)
         const modifiedResult = result.map(movie => ({ title: movie.title, _id: movie._id , series:movie.series}));
         res.json({data:modifiedResult, auth:true})
@@ -36,6 +37,7 @@ const Searchmovie = async(req, res)=>{
     }
 }
 const homemovie = async(req, res)=>{
+    try{
     const lette = req.params.search
     const letter = lette.trim()
     if(letter == "")
@@ -43,7 +45,7 @@ const homemovie = async(req, res)=>{
     
         return res.json({data:[],auth:true})
     }
-    try{
+   
         const result = await movies.find({ title:{'$regex':`${letter}`, $options: 'i'}}).limit(5)
         const modifiedResult = result.map(movie => ({ title: movie.title, _id: movie._id }));
         res.json({data:modifiedResult, auth:true})
@@ -54,9 +56,10 @@ const homemovie = async(req, res)=>{
     }
 }
 const Search = async(req, res)=>{
+    try{
     const lette = req.params.search
-    const cate = req.query.cate.toUpperCase()
-    const type = req.query.type.toUpperCase()
+    const cate = req?.query?.cate?.toUpperCase()
+    const type = req?.query?.type?.toUpperCase()
     const limit = req.query.limit
     const start = req.query.start
     const letter = lette.trim()
@@ -65,7 +68,7 @@ const Search = async(req, res)=>{
     
         return res.json({data:[],auth:true})
     }
-    try{
+    
          if(cate != "ASIANSERIES" && cate != "ANIME" && cate != "TVSHOWS" && cate != "MOVIES"){
            
         const resu = await movies.find({ title:{'$regex':`${letter}`, $options: 'i'}, $or: [
